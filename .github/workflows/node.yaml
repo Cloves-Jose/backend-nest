@@ -34,7 +34,8 @@ jobs:
 
       # - name: Run tests
       #   run: npm run test
-      
+      - run: npm i @nestjs/cli
+      - run: npm install
       - run: npm ci
       - run: npm run build --if-present
       - run: npm test
