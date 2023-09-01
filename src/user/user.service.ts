@@ -2,13 +2,12 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import * as bcrypt from 'bcrypt'
-import { UpdatePatchUserDto } from './dto/update-patch-user.dto';
 
 @Injectable()
 export class UserService {
     constructor(private readonly prisma: PrismaService) {}
 
-    async create({ email, name, password }: CreateUserDto) {
+    async create({ email, name, password, role }: CreateUserDto) {
         
         const saltOrRounds = 10
         const hash = await bcrypt.hash(password, saltOrRounds)
@@ -17,11 +16,13 @@ export class UserService {
             data: {
                 email: email,
                 name: name,
+                role: role,
                 password: hash
             },
             select: {
                 name: true,
                 email: true,
+                role: true,
                 createdAt: true
             }
         })
@@ -36,6 +37,7 @@ export class UserService {
             select: {
                 id: true,
                 name: true,
+                role: true,
                 email: true,
                 password: true
             }

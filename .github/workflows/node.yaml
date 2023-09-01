@@ -23,17 +23,6 @@ jobs:
           node-version: ${{ matrix.node-version }}
           cache: 'npm'
 
-      # - name: Install npm
-      #   run: npm i npm
-
-      # - name: Install dependencies
-      #   run: npm install
-
-      # - name: Lint code
-      #   run: npm run lint
-
-      # - name: Run tests
-      #   run: npm run test
       - run: npm i @nestjs/cli
       - run: npm install
       - run: npm ci

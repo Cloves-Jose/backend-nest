@@ -2,16 +2,25 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { UserService } from 'src/user/user.service';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt'
-// import { PrismaService } from 'src/prisma/prisma.service';
+import { PrismaService } from 'src/prisma/prisma.service';
 // import { CreateUserDto } from 'src/user/dto/create-user.dto';
 
 @Injectable()
 export class AuthService {
     constructor(
-        // private prismaService: PrismaService,
+        private prismaService: PrismaService,
         private userService: UserService,
         private jwtService: JwtService
         ) {}
+    
+
+    async generateToken(id: string, role: string) {
+        const payload = { sub: id, role: role }
+
+        return {
+            access_token: await this.jwtService.signAsync(payload)
+        }
+    }
 
     async signIn(email: string, password: string): Promise<any> {
         const user = await this.userService.findOne(email)
@@ -22,10 +31,14 @@ export class AuthService {
             throw new UnauthorizedException('E-mail e/ou senha incorretos.')
         }
 
-        const payload = { sub: user.id, useremail: user.email }
-        return {
-            access_token: await this.jwtService.signAsync(payload)
-        }
+        let result = await this.generateToken(user.id, user.role)
+
+        return result
+
+    }
+
+    async checkToken(token: string) {
+        return this.jwtService.verifyAsync(token)
     }
 
     // async forget(email: string) {
@@ -39,22 +52,24 @@ export class AuthService {
     //     return true
     // }
 
-    // async reset(password: string, token: string) {
-    //     // To do: validar o token...
+    async reset(password: string, token: string) {
+        // To do: validar o token...
 
-    //     const id = 'id'
+        const id = 'id'
         
-    //     await this.prismaService.user.update({
-    //         where: {
-    //             id
-    //         },
-    //         data: {
-    //             password
-    //         }
-    //     })
+        const user = await this.prismaService.user.update({
+            where: {
+                id
+            },
+            data: {
+                password
+            }
+        })
 
-    //     return true
+        let result = this.generateToken(user.id, user.role)
+
+        return result
         
-    // }
+    }
 
 }
