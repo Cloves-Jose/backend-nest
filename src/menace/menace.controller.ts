@@ -6,6 +6,7 @@ import { UpdateMenaceDto } from './dto/update-menace.dto';
 import { RolesGuard } from 'src/guards/roles.guard';
 import { Roles } from 'src/roles.decorator';
 import { Role } from 'src/enums/role.enum';
+import { SkipThrottle } from '@nestjs/throttler';
 
 @Controller('menace')
 @UseGuards(AuthGuard, RolesGuard)
@@ -20,6 +21,7 @@ export class MenaceController {
     }
 
     @Roles(Role.ADMIN, Role.USER)
+    @SkipThrottle()
     @Get()
     async getMenace() {
         return this.menaceService.getMenace()
